@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Add html2pdf for easy PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body class="dark-theme">
+    <!-- Architecture Diagram Modal -->
+    <div id="arch-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2><i class="fa-solid fa-network-wired"></i> System Architecture (Microservices)</h2>
+            <br>
+            <div class="arch-diagram">
+                <div class="arch-box">💻 <b>Frontend (UI)</b><br><small>HTML/CSS/JS</small></div>
+                <i class="fa-solid fa-arrow-right arch-arrow"></i>
+                <div class="arch-box">☕ <b>Java API Gateway</b><br><small>Spring Boot (Port
+                        8080)</small><br><small><i>Handles routing & orchestration</i></small></div>
+                <i class="fa-solid fa-arrow-right arch-arrow"></i>
+                <div class="arch-box">🐍 <b>Python NLP Engine</b><br><small>Flask (Port
+                        5000)</small><br><small><i>TF-IDF, Domain clustering, Core NLP</i></small></div>
+            </div>
+            <p style="margin-top: 20px; color: var(--text-muted);">
+                <b>JSON payload is transmitted via REST endpoints.</b> The Python microservice isolates heavy linguistic
+                processing from the main Java web server.
+            </p>
+        </div>
+    </div>
+
+    <!-- History Progress Modal -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content glass-panel" style="max-width: 800px;">
+            <span class="close-btn" id="close-history-modal">&times;</span>
+            <h2><i class="fa-solid fa-chart-line"></i> My ATS Score Progress</h2>
+            <br>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px;">
+                <canvas id="progressChart" width="400" height="200"></canvas>
+            </div>
+            <p style="margin-top: 15px; color: var(--text-muted); font-size: 14px; text-align: center;">
+                <i class="fa-solid fa-cloud"></i> History is securely saved to the local SQLite Database via the Java
+                API Gateway.
+            </p>
+        </div>
+    </div>
+
+    <div class="background-effects">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+
+    <div id="llm-warning-banner"
+        style="display: none; background-color: var(--danger); color: white; text-align: center; padding: 12px; font-weight: bold; position: sticky; top: 0; z-index: 9999;">
+        <i class="fa-solid fa-triangle-exclamation"></i> LLM NOT ACTIVE - SYSTEM RUNNING IN FALLBACK MODE
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar glass-panel">
+        <div class="logo">
+            <img src="logo.svg" alt="Resume Analyzer Logo" width="32" height="32">
+            <span>Resume Analyzer</span>
+        </div>
+        <ul class="nav-links">
+            <li class="active" id="nav-home" onclick="switchPage('landing')"><i class="fa-solid fa-house"></i> Home</li>
+            <li id="nav-analyze" onclick="switchPage('setup')"><i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate
+                Resume</li>
+            <li id="nav-history" onclick="openHistoryModal()"><i class="fa-solid fa-chart-line"></i> My Progress</li>
+            <li id="nav-system" onclick="openArchModal()"><i class="fa-solid fa-server"></i> Architecture</li>
+        </ul>
+        <div class="nav-footer">
+            <div class="status-indicator">
+                <div class="dot pulse-green"></div> Engine Online
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- 1. LANDING PAGE -->
+        <section id="page-landing" class="page active">
+            <div class="hero">
+                <h1>Intelligent <span class="gradient-text">Resume Evaluation</span></h1>
+                <p>Upload your resume and let our NLP Engine detect your domain, extract your skills, and calculate a
+                    realistic readiness score.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary btn-large" onclick="switchPage('setup')">Start Evaluation <i
+                            class="fa-solid fa-arrow-right"></i></button>
+                    <button class="btn-outline btn-large" onclick="openArchModal()"><i
+                            class="fa-solid fa-diagram-project"></i> View Architecture</button>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card glass-panel">
+                    <i class="fa-solid fa-microscope feature-icon"></i>
+                    <h3>Domain Detection</h3>
+                    <p>TF-IDF Cosine Similarity clusters your resume automatically.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <i class="fa-solid fa-clipboard-check feature-icon"></i>
+                    <h3>Realistic Scoring</h3>
+                    <p>Strict heuristics verify quality, experience depth, and ATS format.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <i class="fa-solid fa-robot feature-icon"></i>
+                    <h3>Domain Assistant</h3>
+                    <p>Dynamic NLP engine gives intent-based feedback mapped to your weaknesses.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SETUP PAGE -->
+        <section id="page-setup" class="page glass-panel">
+            <div class="setup-header">
+                <h2>Resume Upload</h2>
+                <p>No job descriptions needed. Let the AI evaluate your inherent strengths.</p>
+            </div>
+
+            <form id="analyze-form">
+                <div class="form-group mt-4">
+                    <label><i class="fa-solid fa-user"></i> Your Username (for Progress Tracking)</label>
+                    <input type="text" id="username-input" class="glass-input" placeholder="e.g. johndoe123"
+                        style="width: 100%; padding: 10px; margin-bottom: 15px;" required>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label><i class="fa-solid fa-file-pdf"></i> Resume Document</label>
+                    <div class="file-drop-area" id="drop-area">
+                        <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                        <span class="file-message">Drag & Drop PDF/DOCX</span>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                    </div>
+                    <div id="file-name-display"></div>
+                </div>
+
+                <button type="submit" class="btn-primary w-100 mt-4" id="analyze-btn">
+                    <i class="fa-solid fa-cogs"></i> Run AI Evaluation
+                </button>
+                <div id="loader" class="loader" style="display:none;">
+                    <div class="spinner"></div>
+                    <p>Routing to Python NLP Service...</p>
+                </div>
+            </form>
+        </section>
+
+        <!-- 3. DASHBOARD PAGE -->
+        <section id="page-dashboard" class="page" id="dashboard-content">
+            <div class="dash-header">
+                <div>
+                    <h2>Domain: <span id="domain-display" class="gradient-text">Analyzing...</span> <span
+                            style="font-size: 14px; color: var(--text-muted);" id="domain-conf"></span></h2>
+                    <div>
+                        <span class="badge" id="word-count-badge">Words</span>
+                        <span class="badge badge-warning" id="spelling-badge"
+                            style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); display: none;">Spelling</span>
+                        <span class="badge badge-warning" id="weak-phrase-badge"
+                            style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); display: none;">Weak
+                            Writing</span>
+                    </div>
+                </div>
+                <div class="export-actions">
+                    <button class="btn-outline" id="export-pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                </div>
+            </div>
+
+            <!-- Score Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card glass-panel text-center">
+                    <h4>Overall Score</h4>
+                    <div class="ring-container">
+                        <div class="ring" id="ring-final">0%</div>
+                    </div>
+                </div>
+                <div class="metric-card glass-panel text-center">
+                    <h4>Quality/Skills</h4>
+                    <div class="ring-container">
+                        <div class="ring" id="ring-quality">0%</div>
+                    </div>
+                </div>
+                <div class="metric-card glass-panel text-center">
+                    <h4>Experience</h4>
+                    <div class="ring-container">
+                        <div class="ring" id="ring-exp">0%</div>
+                    </div>
+                </div>
+                <div class="metric-card glass-panel text-center">
+                    <h4>ATS Score</h4>
+                    <div class="ring-container">
+                        <div class="ring" id="ring-ats">0%</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Live Real-Time Editor -->
+            <div class="dashboard-card glass-panel mt-4">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3><i class="fa-solid fa-code" style="color: var(--primary);"></i> Live Resume Editor <span
+                            class="badge" style="background-color: var(--primary); color: white;">BETA</span></h3>
+                    <div id="live-saving-indicator" style="display: none; color: var(--text-muted); font-size: 14px;">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Scoring...
+                    </div>
+                </div>
+                <p class="text-muted" style="margin-bottom: 10px;">Edit your resume text here and watch your ATS,
+                    Experience, and Quality scores adjust in real-time. Use strong action verbs, fix spelling mistakes,
+                    and add measurable numbers!</p>
+                <textarea id="live-editor" class="glass-input"
+                    style="width: 100%; min-height: 250px; padding: 15px; font-family: monospace; resize: vertical;"
+                    placeholder="Your parsed resume text will appear here..."></textarea>
+            </div>
+
+            <div class="dash-grid-2 mt-4">
+                <!-- Strengths -->
+                <div class="dashboard-card glass-panel">
+                    <h3><i class="fa-solid fa-bolt" style="color: var(--success);"></i> Strength Areas</h3>
+                    <ul class="suggestion-list" id="strengths-list"></ul>
+                </div>
+
+                <!-- Weaknesses -->
+                <div class="dashboard-card glass-panel">
+                    <h3><i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i> Weakness Areas
+                    </h3>
+                    <ul class="suggestion-list" id="weakness-list"></ul>
+                </div>
+            </div>
+
+            <div class="dashboard-card glass-panel mt-4">
+                <h3><i class="fa-solid fa-layer-group"></i> Categorized Skills Detected</h3>
+
+                <div style="margin-top: 15px;">
+                    <h4 style="margin-bottom: 5px; color: var(--text-muted);"><i class="fa-solid fa-code"></i> Technical
+                        <span id="tech-count"></span>
+                    </h4>
+                    <div class="chips mb-3" id="chips-tech"></div>
+
+                    <h4 style="margin-bottom: 5px; color: var(--text-muted);"><i class="fa-solid fa-users"></i> Soft
+                        Skills <span id="soft-count"></span></h4>
+                    <div class="chips mb-3" id="chips-soft"></div>
+
+                    <h4 style="margin-bottom: 5px; color: var(--text-muted);"><i class="fa-solid fa-toolbox"></i> Tools
+                        & Platforms <span id="tools-count"></span></h4>
+                    <div class="chips" id="chips-tools"></div>
+                </div>
+            </div>
+
+            <!-- AI Bullet Improver -->
+            <div class="dashboard-card glass-panel mt-4">
+                <h3><i class="fa-solid fa-pen-nib"></i> AI Bullet Improver</h3>
+                <p class="text-muted">Enter a weak resume bullet point to make it ATS friendly and action-oriented.</p>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <input type="text" id="bullet-input" placeholder="e.g. Worked on website and fixed bugs..."
+                        class="w-100 p-2 glass-input">
+                    <button class="btn-primary" style="white-space: nowrap;" id="btn-improve">Improve</button>
+                </div>
+                <div class="improved-output mt-3" id="bullet-output" style="display:none;"></div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Rule-Based Career Assistant FAB -->
+    <div class="chat-fab" id="chat-fab" onclick="toggleChat()">
+        <i class="fa-solid fa-message"></i>
+    </div>
+
+    <div class="chat-panel glass-panel" id="chat-panel">
+        <div class="chat-header">
+            <h4><i class="fa-solid fa-robot"></i> AI Assistant</h4>
+            <i class="fa-solid fa-xmark cursor-pointer" onclick="toggleChat()"></i>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="msg bot">Hello! I am your Evaluation Assistant. Run an analysis first, then ask me how to
+                improve!
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Ask a question..." onkeypress="handleChatEnter(event)">
+            <button id="chat-send" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
