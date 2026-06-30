@@ -47,9 +47,6 @@ Advanced-Resume-Analyzer/
 ## ⚙️ Installation
 
 1. Clone the repository
-```
-git clone https://github.com/YourUsername/Advanced-Resume-Analyzer.git
-```
 
 2. Install the required dependencies.
 
@@ -69,4 +66,4 @@ git clone https://github.com/YourUsername/Advanced-Resume-Analyzer.git
 - Sahil Sharma
 - Robin Singh
 
-## 📜 License
+
