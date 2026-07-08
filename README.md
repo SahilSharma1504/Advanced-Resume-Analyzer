@@ -7,7 +7,7 @@ A powerful Resume Analyzer tool built with a**Java Spring Boot backend**, a **Py
 - `java-backend/`: Acts as the API gateway and interacts with the Python engine.
 - `frontend/`: A premium Vanilla HTML/CSS/JS frontend to interact with the analyzer. 
     
-## Prerequisites  
+## Prerequisites   
 - Java 17+ 
 - Maven
 - Python 3.8+ 
