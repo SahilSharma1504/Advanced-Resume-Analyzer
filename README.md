@@ -18,7 +18,7 @@ A powerful Resume Analyzer tool built with a**Java Spring Boot backend**, a **Py
 ### Automatic Startup (Recommended)
 To start the entire system:
 1. Double-click `run_project.bat` 
-This will launch the Frontend, Java Backend, Python API, and Gemini integration automatically.
+This will launch the Frontend, Java Backend, Python API, and Gemini integration automatically. 
 
 ### Manual Startup
 #### Step 1: Start the Python AI Engine
