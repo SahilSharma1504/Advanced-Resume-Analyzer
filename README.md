@@ -11,7 +11,7 @@ A powerful Resume Analyzer tool built with a**Java Spring Boot backend**, a **Py
 - Java 17+    
 - Maven      
 - Python 3.8+  
-- pip   
+- pip    
     
 ## How to Run 
   
