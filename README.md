@@ -1,7 +1,7 @@
 # AI Resume Analyzer Pro
  
 A powerful Resume Analyzer tool built with a**Java Spring Boot backend**, a **Python Flask AI Engine**, and a **Beautiful Glassmorphic UI**. 
-
+ 
 ## Project Structure
 - `python-backend/`: Contains text extraction, skill matching, and AI suggestions logic.  
 - `java-backend/`: Acts as the API gateway and interacts with the Python engine.   
