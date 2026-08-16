@@ -12,7 +12,7 @@ A powerful Resume Analyzer tool built with a**Java Spring Boot backend**, a **Py
 - Maven         
 - Python 3.8+          
 - pip     
-      
+       
 ## How to Run 
     
 ### Automatic Startup (Recommended)
