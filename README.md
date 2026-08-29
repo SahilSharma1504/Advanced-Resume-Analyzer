@@ -14,7 +14,7 @@ A powerful Resume Analyzer tool built with a**Java Spring Boot backend**, a **Py
 - pip     
         
 ## How to Run 
-    
+     
 ### Automatic Startup (Recommended)
 To start the entire system: 
 1. Double-click `run_project.bat` 
